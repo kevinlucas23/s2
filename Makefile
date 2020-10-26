@@ -1,5 +1,5 @@
 
-MODULE	 = proj2
+MODULE	 = s2fs
 
 obj-m += $(MODULE).o
 
