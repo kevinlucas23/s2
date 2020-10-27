@@ -75,7 +75,7 @@ void processInfo(struct task_struct* task, int n)
             printk("\t");
         }
         i++;
-        printk("%s [%d]", curr->task->comm, curr->task->pid);
+        printk("%s [%d]", curr->comm, curr->pid);
         processInfo(curr, n);
     }
 
