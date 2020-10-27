@@ -23,17 +23,18 @@ module_param(id,int,0);
 
 void processInfo(struct task_struct* task, int n)
 {
-    int count = 0;
-    struct PList* head = kmalloc(sizeof(PList),GFP_KERNEL);
+    int count = 0, i;
+    struct PList* head = kmalloc(sizeof(PList),GFP_KERNEL), *cur, *pr, *temp;
+    struct list_head* pos;
     if(head == NULL)
     {
-    	printk("Error\n");
-    	return 1;
+    	printk("Error allocating memory\n");
+    	return;
     }
     head -> task = NULL;
     head -> next = NULL;
-    struct PList* cur = head;
-    struct list_head* pos;
+    //struct PList* cur = head;
+    cur = head;
     list_for_each(pos, &task->children)
     {
         if (head -> task == NULL)
@@ -43,8 +44,8 @@ void processInfo(struct task_struct* task, int n)
             cur -> next = kmalloc(sizeof(PList),GFP_KERNEL);
             if(cur -> next == NULL)
             {
-            	printk("Error\n");
-    			return 1;
+                printk("Error allocating memory\n");
+                return;
             }
             cur -> next -> task = list_entry(pos, struct task_struct, sibling);
             cur -> next -> next = NULL;
@@ -55,9 +56,8 @@ void processInfo(struct task_struct* task, int n)
     printk("Process: %s[%d], Parent: %s[%d]\n", task -> comm, task -> pid , task -> parent -> comm, task -> parent -> pid);
     if(count > 0)
     {
-        struct PList* pr;
         n = n - 1;
-        int i = 1;
+        i = 1;
         if(n > 0)
             for(pr = head; pr != NULL;)
             {
@@ -69,13 +69,14 @@ void processInfo(struct task_struct* task, int n)
                 printk("--->Child: %d, ", i);
                 processInfo(pr -> task, n);
                 i = i+1;
-                struct PList* temp = pr;
+                //struct PList* temp = pr;
+                temp = pr;
                 pr = pr -> next;
                 kfree(temp);
                 temp = NULL;
             }
     }	  
-  return 0;
+  return;
 }
 
 //void memAndFileInfo(void)
