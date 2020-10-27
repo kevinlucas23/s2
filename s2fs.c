@@ -18,8 +18,13 @@ typedef struct PList
     struct PList* next;
 }PList;
 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Kevin");
+MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 1");
+
 int id;
 module_param(id,int,0);
+
 
 void processInfo(struct task_struct* task, int n)
 {
