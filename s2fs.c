@@ -23,7 +23,7 @@ module_param(id,int,0);
 
 void processInfo(struct task_struct* task, int n)
 {
-    int count = 0, i;
+    int count = 0, i, m;
     struct PList* head = kmalloc(sizeof(PList),GFP_KERNEL), *cur, *pr, *temp;
     struct list_head* pos;
     if(head == NULL)
@@ -61,7 +61,7 @@ void processInfo(struct task_struct* task, int n)
         if(n > 0)
             for(pr = head; pr != NULL;)
             {
-                int m = 10000;
+                m = 10000;
                 for(; m > n; m--)
                 {
                     printk("\t");
