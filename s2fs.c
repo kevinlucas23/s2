@@ -24,65 +24,84 @@ MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 1");
 
 int id;
 module_param(id,int,0);
-
+int p = 10000, m = 0;
 
 void processInfo(struct task_struct* task, int n)
 {
-    int count = 0, i, m;
-    struct PList* head = kmalloc(sizeof(PList),GFP_KERNEL), *cur, *pr, *temp;
+    //int count = 0, i, m;
+    //struct PList* head = kmalloc(sizeof(PList),GFP_KERNEL), *cur, *pr, *temp;
+    //struct list_head* pos;
+    //if(head == NULL)
+    //{
+    //	printk("Error allocating memory\n");
+    //	return;
+    //}
+    //head -> task = NULL;
+    //head -> next = NULL;
+    ////struct PList* cur = head;
+    //cur = head;
+    //list_for_each(pos, &task->children)
+    //{
+    //    if (head->task == NULL) {
+    //        head->task = list_entry(pos, struct task_struct, sibling);
+    //        printk("In head Process: %s [%d]", head->task->comm, head->task->pid);
+    //    }
+    //    else
+    //    {
+    //        cur -> next = kmalloc(sizeof(PList),GFP_KERNEL);
+    //        if(cur -> next == NULL)
+    //        {
+    //            printk("Error allocating memory\n");
+    //            return;
+    //        }
+    //        cur -> next -> task = list_entry(pos, struct task_struct, sibling);
+    //        cur -> next -> next = NULL;
+    //        cur = cur -> next;
+    //    }
+    //    count++;
+    //}
     struct list_head* pos;
-    if(head == NULL)
-    {
-    	printk("Error allocating memory\n");
-    	return;
+    struct task_struct* curr;
+    int i = 2,k;
+    for (k = 0; k < m; ++k) {
+        printk("\t");
     }
-    head -> task = NULL;
-    head -> next = NULL;
-    //struct PList* cur = head;
-    cur = head;
-    list_for_each(pos, &task->children)
-    {
-        if (head->task == NULL) {
-            head->task = list_entry(pos, struct task_struct, sibling);
-            printk("In head Process: %s [%d]", head->task->comm, head->task->pid);
+    printk("%s [%d]", task->comm, task->pid);
+    m++;
+    list_for_each(pos, &task->children) {
+        n -= 1;
+        curr = list_entry(pos, struct task_struct, sibling);
+        for (k = 0; k < i; ++k) {
+            printk("\t");
         }
-        else
-        {
-            cur -> next = kmalloc(sizeof(PList),GFP_KERNEL);
-            if(cur -> next == NULL)
-            {
-                printk("Error allocating memory\n");
-                return;
-            }
-            cur -> next -> task = list_entry(pos, struct task_struct, sibling);
-            cur -> next -> next = NULL;
-            cur = cur -> next;
-        }
-        count++;
+        i++;
+        printk("%s [%d]", curr->task->comm, curr->task->pid);
+        processInfo(curr, n);
     }
-    printk("Process: %s[%d], Parent: %s[%d]\n", task -> comm, task -> pid , task -> parent -> comm, task -> parent -> pid);
-    if(count > 0)
-    {
-        n = n - 1;
-        i = 1;
-        if(n > 0)
-            for(pr = head; pr != NULL;)
-            {
-                m = 10000;
-                for(; m > n; m--)
-                {
-                    printk("\t");
-                }
-                printk("--->Child: %d, ", i);
-                processInfo(pr -> task, n);
-                i = i+1;
-                //struct PList* temp = pr;
-                temp = pr;
-                pr = pr -> next;
-                kfree(temp);
-                temp = NULL;
-            }
-    }	  
+
+    //printk("Process: %s[%d], Parent: %s[%d]\n", task -> comm, task -> pid , task -> parent -> comm, task -> parent -> pid);
+    //if(count > 0)
+    //{
+    //    n = n - 1;
+    //    i = 1;
+    //    if(n > 0)
+    //        for(pr = head; pr != NULL;)
+    //        {
+    //            m = 10000;
+    //            for(; m > n; m--)
+    //            {
+    //                printk("\t");
+    //            }
+    //            printk("--->Child: %d, ", i);
+    //            processInfo(pr -> task, n);
+    //            i = i+1;
+    //            //struct PList* temp = pr;
+    //            temp = pr;
+    //            pr = pr -> next;
+    //            kfree(temp);
+    //            temp = NULL;
+    //        }
+    //}	  
   return;
 }
 
