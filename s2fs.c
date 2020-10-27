@@ -157,8 +157,8 @@ static int s2fs_init(void)
 {
 
 	struct task_struct *task;
+    int n = 10000;
 	task = &init_task;
-	int n = 10000;
 	printk("\n\n//////PROCESS TREE//////\n\n");
 	processInfo(task,n);
 	printk("\n\n"); 
