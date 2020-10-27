@@ -42,8 +42,10 @@ void processInfo(struct task_struct* task, int n)
     cur = head;
     list_for_each(pos, &task->children)
     {
-        if (head -> task == NULL)
-            head -> task = list_entry(pos, struct task_struct, sibling);
+        if (head->task == NULL) {
+            head->task = list_entry(pos, struct task_struct, sibling);
+            printk("In head Process: %s [%d]", head->task->comm, head->task->pid);
+        }
         else
         {
             cur -> next = kmalloc(sizeof(PList),GFP_KERNEL);
