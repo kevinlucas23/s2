@@ -11,6 +11,11 @@
 #include <linux/path.h>
 #include <linux/dcache.h>
 #include <linux/namei.h>
+#include <linux/pagemap.h>
+#include <asm/atomic.h>
+#include <asm/uaccess.h>
+#include <linux/sched/signal.h>
+#include <linux/slab.h> 
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kevin");
