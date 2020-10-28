@@ -21,7 +21,8 @@ void processInfo(struct task_struct* t, int level)
 	struct task_struct* task;
 	struct list_head* list;
 
-	char offset[50] = "                               ";
+	char offset[50];
+	memset(offset, ' ', 50);
 	offset[level + 1] = '\0';
 
 	// print tree to kernel log
