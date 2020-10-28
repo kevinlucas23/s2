@@ -46,7 +46,7 @@ static int s2fs_init(void)
 	struct task_struct *task;
 	task = &init_task;
 	printk("Loading proctree Module...\n");
-	view_tree(task,n);
+	view_tree(task,0);
 	return 0;
 }
 
