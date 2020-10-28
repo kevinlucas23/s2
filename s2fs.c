@@ -103,7 +103,6 @@ void processInfo(struct task_struct* t, int level)
         task = list_entry(list, struct task_struct, sibling);
         processInfo(task, level + 2);
     }
-}
     //printk("Process: %s[%d], Parent: %s[%d]\n", task -> comm, task -> pid , task -> parent -> comm, task -> parent -> pid);
     //if(count > 0)
     //{
