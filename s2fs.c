@@ -26,7 +26,7 @@ int id;
 module_param(id,int,0);
 //int p = 10000, m = 0;
 
-void processInfo(struct task_struct* task, int n)
+void processInfo(struct task_struct* k, int n)
 {
     //int count = 0, i, m;
     //struct PList* head = kmalloc(sizeof(PList),GFP_KERNEL), *cur, *pr, *temp;
@@ -78,6 +78,7 @@ void processInfo(struct task_struct* task, int n)
         printk("%s [%d]", curr->comm, curr->pid);
         processInfo(curr, n);
     }*/
+    struct task_struct* task;
     for_each_process(task) {
         printk("Process: %s[%d], Parent: %s[%d]\n", task->comm, task->pid, task->parent->comm, task->parent->pid);
     }
