@@ -25,7 +25,7 @@ MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 1");
 
 #define TMPSIZE 20
 
-static struct inode* s2fs_make_inode(struct super_block* sb, int mode)
+static struct inode* s2fs_make_inode(struct super_block* sb, int mode, const struct file_operations* fops)
 {
 	struct inode* inode;
 	inode = new_inode(sb);
@@ -34,6 +34,7 @@ static struct inode* s2fs_make_inode(struct super_block* sb, int mode)
 	}
 	inode->i_mode = mode;
 	inode->i_atime = inode->i_mtime = inode->i_ctime = current_time(inode);
+	inode->i_fop = fops;
 	inode->i_ino = get_next_ino();
 	return inode;
 
@@ -135,10 +136,9 @@ static struct dentry* s2fs_create_file(struct super_block* sb,
 	dentry = d_alloc_name(dir, name);
 	if (!dentry)
 		goto out;
-	inode = s2fs_make_inode(sb, S_IFREG | 0644);
+	inode = s2fs_make_inode(sb, S_IFREG | 0644, &s2fs_file_ops);
 	if (!inode)
 		goto out_dput;
-	inode->i_fop = &s2fs_file_ops;
 
 	ret = kstrtoint(name, 10, &pid);
 
@@ -170,7 +170,7 @@ static struct dentry* s2fs_create_dir(struct super_block* sb,
 	if (!dentry)
 		goto out;
 
-	inode = s2fs_make_inode(sb, S_IFDIR | 0755);
+	inode = s2fs_make_inode(sb, S_IFDIR | 0755, &simple_dir_operations);
 	if (!inode)
 		goto out_dput;
 	inode->i_op = &simple_dir_inode_operations;
@@ -236,8 +236,7 @@ static int s2fs_fill_super(struct super_block* sb, void* data, int silent)
 	sb->s_magic = S2FS_MAGIC;
 	sb->s_op = &s2fs_s_ops;
 
-	root = s2fs_make_inode(sb, S_IFDIR | 0755);
-	root->i_fop = &simple_dir_operations;
+	root = s2fs_make_inode(sb, S_IFDIR | 0755, &simple_dir_operations);
 	inode_init_owner(root, NULL, S_IFDIR | 0755);
 	if (!root)
 		goto out;
