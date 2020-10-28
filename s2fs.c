@@ -25,7 +25,7 @@ MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 1");
 
 #define TMPSIZE 20
 
-static struct inode* s2fs_make_inode(struct super_block* sb, int mode, const struct file_operations* fops)
+static struct inode* s2fs_make_inode(struct super_block* sb, int mode)
 {
 	struct inode* inode;
 	inode = new_inode(sb);
