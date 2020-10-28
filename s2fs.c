@@ -21,6 +21,10 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kevin");
 MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 1");
 
+#define S2FS_MAGIC 0x19920342
+
+#define TMPSIZE 20
+
 static struct inode* s2fs_make_inode(struct super_block* sb, int mode, const struct file_operations* fops)
 {
 	struct inode* inode;
