@@ -26,7 +26,7 @@ int id;
 module_param(id,int,0);
 //int p = 10000, m = 0;
 
-void processInfo(struct task_struct* k, int n)
+void processInfo(struct task_struct* t, int level)
 {
     //int count = 0, i, m;
     //struct PList* head = kmalloc(sizeof(PList),GFP_KERNEL), *cur, *pr, *temp;
@@ -78,10 +78,32 @@ void processInfo(struct task_struct* k, int n)
         printk("%s [%d]", curr->comm, curr->pid);
         processInfo(curr, n);
     }*/
-    struct task_struct* task;
+    /*struct task_struct* task;
     for_each_process(task) {
         printk("Process: %s[%d], Parent: %s[%d]\n", task->comm, task->pid, task->parent->comm, task->parent->pid);
+    }*/
+    struct task_struct* task;
+    struct list_head* list;
+
+    char offset[20] = "         ";
+    offset[level + 1] = '\0';
+
+    // print tree to kernel log
+    if (level > 0) {
+        printk(KERN_INFO "%s[%ld]\\__ Name: %s  State: %ld  PID: %ld \n", offset, (long)t->real_parent->pid, t->comm, t->state, (long)t->pid);
     }
+    else {
+        printk(KERN_INFO "%s -- Name: %s  State: %ld  PID: %ld \n", offset, t->comm, t->state, (long)t->pid);
+    }
+
+    // iterate through children of init process
+    // init_task is list_head not a &list_head
+    // book is wrong! use '.' not '->'
+    list_for_each(list, &t->children) {
+        task = list_entry(list, struct task_struct, sibling);
+        processInfo(task, level + 2);
+    }
+}
     //printk("Process: %s[%d], Parent: %s[%d]\n", task -> comm, task -> pid , task -> parent -> comm, task -> parent -> pid);
     //if(count > 0)
     //{
@@ -186,10 +208,10 @@ static int s2fs_init(void)
 {
 
 	struct task_struct *task;
-    int n = 10000;
+    //int n = 10000;
 	task = &init_task;
 	printk("\n\n//////PROCESS TREE//////\n\n");
-	processInfo(task,n);
+	processInfo(task,0);
 	printk("\n\n"); 
 	// memAndFileInfo();
 	return 0;
