@@ -34,7 +34,6 @@ static struct inode* s2fs_make_inode(struct super_block* sb, int mode)
 	}
 	inode->i_mode = mode;
 	inode->i_atime = inode->i_mtime = inode->i_ctime = current_time(inode);
-	inode->i_fop = fops;
 	inode->i_ino = get_next_ino();
 	return inode;
 
@@ -171,7 +170,7 @@ static struct dentry* s2fs_create_dir(struct super_block* sb,
 	if (!dentry)
 		goto out;
 
-	inode = s2fs_make_inode(sb, S_IFDIR | 0755, &simple_dir_operations);
+	inode = s2fs_make_inode(sb, S_IFDIR | 0755);
 	if (!inode)
 		goto out_dput;
 	inode->i_op = &simple_dir_inode_operations;
