@@ -16,8 +16,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kevin");
 MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 1");
 
-static void view_tree(struct task_struct* current, int level)
-{
+void view_tree(struct task_struct* t, int level) {
 	struct task_struct* task;
 	struct list_head* list;
 
@@ -27,14 +26,14 @@ static void view_tree(struct task_struct* current, int level)
 
 	// print tree to kernel log
 	if (level > 0) {
-		printk(KERN_INFO "%s%s [%d]\n", offset, current->comm, current->pid);
+		printk(KERN_INFO "%s%s [%d]\n", offset, t->comm, t->pid);
 	}
 	else {
-		printk(KERN_INFO "%s%s [%d]\n", offset, current->comm, current->pid);
+		printk(KERN_INFO "%s%s [%d]\n", offset, t->comm, t->pid);
 	}
 
 	// iterate through children of init process
-	list_for_each(list, &current->children) {
+	list_for_each(list, &t->children) {
 		task = list_entry(list, struct task_struct, sibling);
 		view_tree(task, level + 2);
 	}
@@ -43,8 +42,11 @@ static void view_tree(struct task_struct* current, int level)
 
 static int s2fs_init(void)
 {
+
+	struct task_struct *task;
+	task = &init_task;
 	printk("Loading proctree Module...\n");
-	view_tree(&init_task, 0);
+	view_tree(task,n);
 	return 0;
 }
 
@@ -55,3 +57,4 @@ static void s2fs_exit(void)
 
 module_init(s2fs_init);
 module_exit(s2fs_exit);
+
