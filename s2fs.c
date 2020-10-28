@@ -27,10 +27,10 @@ void processInfo(struct task_struct* t, int level)
 
 	// print tree to kernel log
 	if (level > 0) {
-		printk(KERN_INFO "%s %s [%d]\n", offset, t->comm, t->pid);
+		printk(KERN_INFO "%s%s [%d]\n", offset, t->comm, t->pid);
 	}
 	else {
-		printk(KERN_INFO "%s %s [%d]\n", offset, t->comm, t->pid);
+		printk(KERN_INFO "%s%s [%d]\n", offset, t->comm, t->pid);
 	}
 
 	// iterate through children of init process
