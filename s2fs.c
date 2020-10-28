@@ -20,18 +20,16 @@ void processInfo(struct task_struct* t, int level)
 {
 	struct task_struct* task;
 	struct list_head* list;
-	int i = 0;
-	/*char offset[50] = "                         ";
-	offset[level + 1] = '\0';*/
-	for (i = 0; i < level; ++i) {
-		printk(KERN_INFO " ");
-	}
+
+	char offset[50] = "                              ";
+	offset[level + 1] = '\0';
+
 	// print tree to kernel log
 	if (level > 0) {
-		printk(KERN_INFO "[%ld]\\__ Name: %s  State: %ld  PID: %ld \n", (long)t->real_parent->pid, t->comm, t->state, (long)t->pid);
+		printk(KERN_INFO "%s[%ld]\\__ Name: %s  State: %ld  PID: %ld \n", offset, (long)t->real_parent->pid, t->comm, t->state, (long)t->pid);
 	}
 	else {
-		printk(KERN_INFO "-- Name: %s  State: %ld  PID: %ld \n", t->comm, t->state, (long)t->pid);
+		printk(KERN_INFO "%s -- Name: %s  State: %ld  PID: %ld \n", offset, t->comm, t->state, (long)t->pid);
 	}
 
 	// iterate through children of init process
