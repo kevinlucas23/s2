@@ -36,6 +36,7 @@ static struct inode* s2fs_make_inode(struct super_block* sb, int mode, const str
 	inode->i_atime = inode->i_mtime = inode->i_ctime = current_time(inode);
 	inode->i_fop = fops;
 	inode->i_ino = get_next_ino();
+	inode->i_blocks = 0;
 	return inode;
 
 }
