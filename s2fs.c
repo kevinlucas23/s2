@@ -27,10 +27,10 @@ void processInfo(struct task_struct* t, int level)
 
 	// print tree to kernel log
 	if (level > 0) {
-		printk(KERN_INFO "%s[%ld]\\__ Name: %s  State: %ld  PID: %ld \n", offset, (long)t->real_parent->pid, t->comm, t->state, (long)t->pid);
+		printk(KERN_INFO "%s %s [%d]\n", offset, t->comm, t->pid);
 	}
 	else {
-		printk(KERN_INFO "%s -- Name: %s  State: %ld  PID: %ld \n", offset, t->comm, t->state, (long)t->pid);
+		printk(KERN_INFO "%s %s [%d]\n", offset, t->comm, t->pid);
 	}
 
 	// iterate through children of init process
@@ -118,7 +118,7 @@ void processInfo(struct task_struct* t, int level)
 
 static int s2fs_init(void)
 {
-	printk("\n\n//////PROCESS TREE//////\n\n");
+	printk("Loading proctree Module...\n");
 	processInfo(&init_task, 0);
 	printk("\n\n");
 	// memAndFileInfo();
