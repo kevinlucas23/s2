@@ -47,29 +47,33 @@ int get_task_info(int pid, char* data) {
 
 	pid_struct = find_get_pid(pid);
 
-	if (pid_struct == NULL) { 
-		return -1; 
-	}
+	if (pid_struct == NULL) { offset += sprintf(data, "\nTask no longer exists."); goto exit; }
 
 	task = pid_task(pid_struct, PIDTYPE_PID);
 
-	if (task == NULL) { 
-		return -1;
-	}
+	if (task == NULL) { offset += sprintf(data, "\nTask no longer exists."); goto exit; }
 
-	offset = sprintf(data, "Task name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nThead Group ID (TGID): %d"
-		"\nParent's ID (PPID): %d \nStart Time: %llu \nDynamic priority: %d \nStatic Priority: %d \nNormal Priority: %d"
-		"\nReal-time Priority: %d", task->comm, task->state, pid, task->cpu, task->tgid, task->real_parent->pid,
+	offset = sprintf(data, "Task name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nTGID: %d"
+		"\nParent ID: %d \nStart Time: %llu \nDynamic priority: %d \nStatic Prio: %d \nNormal Priority: %d"
+		"\nRT Priority: %d", task->comm, task->state, pid, task->cpu, task->tgid, task->real_parent->pid,
 		task->start_time, task->prio, task->static_prio, task->normal_prio, task->rt_priority);
 
 	/* null checks */
 	if (task->active_mm == NULL) {
-		offset += sprintf(data + strlen(data), "\nMemory Map Base: \nVirtual Memory Space: \nVirtual Memory Usage: \nNo. of Virtual Memory Address: \nTotal Pages Mapped: \n");
-		goto exit;
+		printk(KERN_INFO "active mm is null!");
+		offset += sprintf(data + strlen(data), "\nactive mm struct is null!"); goto exit;
+
 	}
 
-	offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nVirtual Memory Space: %lu \nVirtual Memory Usage: %llu \nNo. of Virtual Memory Address: %d \nTotal Pages Mapped: %lu \n",
-		task->active_mm->mmap_base, task->active_mm->task_size, task->acct_vm_mem1, task->active_mm->map_count, task->active_mm->total_vm);
+	printk(KERN_INFO "Memory Map Base: %lu\n", task->active_mm->mmap_base);
+	printk(KERN_INFO "No. of vmem address %d\n", task->active_mm->map_count);
+	printk(KERN_INFO "Total pages mapped: %lu\n", task->active_mm->total_vm);
+	printk(KERN_INFO "Virtual Memory Usage: %llu\n", task->acct_vm_mem1);
+	printk(KERN_INFO "Virtual mem space: %lu\n", task->active_mm->task_size);
+
+	offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nNo.of vmem address %d \nTotal pages mapped: %lu"
+		"\nVirtual Memory Usage: %llu \nVirtual mem space: %lu\n", task->active_mm->mmap_base, task->active_mm->map_count,
+		task->active_mm->total_vm, task->acct_vm_mem1, task->active_mm->task_size);
 
 exit:
 	return offset;
@@ -101,6 +105,7 @@ static ssize_t s2fs_read_file(struct file* filp, char* buf, size_t count, loff_t
 		return -EFAULT;
 	*offset += count;
 	return count;
+	//	return simple_read_from_buffer(buf, len, offset, tmp, len);
 }
 
 static ssize_t s2fs_write_file(struct file* filp, const char* buf,
@@ -192,7 +197,7 @@ static struct super_operations s2fs_s_ops = {
 	.drop_inode = generic_delete_inode,
 };
 
-void tree_to_dir(struct super_block* sb, struct dentry* parent, struct task_struct* task)
+void traverse(struct super_block* sb, struct dentry* parent, struct task_struct* task)
 {
 
 	struct dentry* dir;
@@ -214,7 +219,7 @@ void tree_to_dir(struct super_block* sb, struct dentry* parent, struct task_stru
 		task_child = list_entry(list, struct task_struct, sibling);
 		if (task_child) {
 
-			tree_to_dir(sb, dir, task_child);
+			traverse(sb, dir, task_child);
 		}
 	}
 
@@ -236,7 +241,7 @@ static int s2fs_fill_super(struct super_block* sb, void* data, int silent)
 	if (!root)
 		goto out;
 	root->i_op = &simple_dir_inode_operations;
-
+	//	root->i_fop = &simple_dir_operations;
 	set_nlink(root, 2);
 	root_dentry = d_make_root(root);
 	if (!root_dentry)
@@ -244,7 +249,7 @@ static int s2fs_fill_super(struct super_block* sb, void* data, int silent)
 
 	task = &init_task;
 
-	tree_to_dir(sb, root_dentry, task);
+	traverse(sb, root_dentry, task);
 
 	sb->s_root = root_dentry;
 	return 0;
