@@ -53,9 +53,11 @@ int get_task_info(int pid, char* data) {
 
 	task = pid_task(pid_struct, PIDTYPE_PID);
 
-	if (task == NULL) { 
-		return -1;
-	}
+	if (pid_struct == NULL) { offset += sprintf(data, "Task no longer exists.\n"); goto exit; }
+
+	task = pid_task(pid_struct, PIDTYPE_PID);
+
+	if (task == NULL) { offset += sprintf(data, "Task no longer exists.\n"); goto exit; }
 
 	offset = sprintf(data, "Task name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nThead Group ID (TGID): %d"
 		"\nParent's ID (PPID): %d \nStart Time: %llu \nDynamic priority: %d \nStatic Priority: %d \nNormal Priority: %d"
