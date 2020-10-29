@@ -53,27 +53,22 @@ int get_task_info(int pid, char* data) {
 
 	if (task == NULL) { offset += sprintf(data, "\nTask no longer exists."); goto exit; }
 
-	offset = sprintf(data, "Task name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nTGID: %d"
+	/*offset = sprintf(data, "Task name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nTGID: %d"
 		"\nParent ID: %d \nStart Time: %llu \nDynamic priority: %d \nStatic Prio: %d \nNormal Priority: %d"
 		"\nRT Priority: %d", task->comm, task->state, pid, task->cpu, task->tgid, task->real_parent->pid,
-		task->start_time, task->prio, task->static_prio, task->normal_prio, task->rt_priority);
+		task->start_time, task->prio, task->static_prio, task->normal_prio, task->rt_priority);*/
 
 	/* null checks */
-	if (task->active_mm == NULL) {
-		printk(KERN_INFO "active mm is null!");
+	/*if (task->active_mm == NULL) {
 		offset += sprintf(data + strlen(data), "\nactive mm struct is null!"); goto exit;
 
-	}
+	}*/
 
-	printk(KERN_INFO "Memory Map Base: %lu\n", task->active_mm->mmap_base);
-	printk(KERN_INFO "No. of vmem address %d\n", task->active_mm->map_count);
-	printk(KERN_INFO "Total pages mapped: %lu\n", task->active_mm->total_vm);
-	printk(KERN_INFO "Virtual Memory Usage: %llu\n", task->acct_vm_mem1);
-	printk(KERN_INFO "Virtual mem space: %lu\n", task->active_mm->task_size);
-
-	offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nNo.of vmem address %d \nTotal pages mapped: %lu"
+	/*offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nNo.of vmem address %d \nTotal pages mapped: %lu"
 		"\nVirtual Memory Usage: %llu \nVirtual mem space: %lu\n", task->active_mm->mmap_base, task->active_mm->map_count,
-		task->active_mm->total_vm, task->acct_vm_mem1, task->active_mm->task_size);
+		task->active_mm->total_vm, task->acct_vm_mem1, task->active_mm->task_size);*/
+
+	offset = sprintf(data, "Hello World!");
 
 exit:
 	return offset;
