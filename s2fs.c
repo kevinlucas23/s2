@@ -68,8 +68,8 @@ int get_task_info(int pid, char* data) {
 		goto exit;
 	}
 
-	offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nVirtual Memory Space: %lu \nVirtual Memory Usage: %llu \nNo. of Virtual Memory Address: %d \nTotal Pages Mapped: %lu \n", task->active_mm->mmap_base,
-		task->active_mm->task_size, task->acct_vm_mem1, task->active_mm->total_vm, task->active_mm->map_count);
+	offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nVirtual Memory Space: %lu \nVirtual Memory Usage: %llu \nNo. of Virtual Memory Address: %d \nTotal Pages Mapped: %lu \n",
+		task->active_mm->mmap_base, task->active_mm->task_size, task->acct_vm_mem1, task->active_mm->map_count, task->active_mm->total_vm);
 
 exit:
 	return offset;
