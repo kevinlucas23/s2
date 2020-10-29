@@ -68,7 +68,7 @@ int get_task_info(int pid, char* data) {
 	//	"\nVirtual Memory Usage: %llu \nVirtual mem space: %lu\n", task->active_mm->mmap_base, task->active_mm->map_count,
 	//	task->active_mm->total_vm, task->acct_vm_mem1, task->active_mm->task_size);*/
 
-	offset = sprintf(data, "Hello World!");
+	offset = sprintf(data, "Hello World!\n");
 
 exit:
 	return offset;
