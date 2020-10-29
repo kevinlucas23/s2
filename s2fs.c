@@ -40,47 +40,11 @@ static struct inode* s2fs_make_inode(struct super_block* sb, int mode, const str
 
 }
 
-//int get_task_info(int pid, char* data) {
-//	struct task_struct* task;
-//	struct pid* pid_struct;
-//	int offset = 0;
-//
-//	//pid_struct = find_get_pid(pid);
-//
-//	//if (pid_struct == NULL) { offset += sprintf(data, "\nTask no longer exists."); goto exit; }
-//
-//	//task = pid_task(pid_struct, PIDTYPE_PID);
-//
-//	//if (task == NULL) { offset += sprintf(data, "\nTask no longer exists."); goto exit; }
-//
-//	///*offset = sprintf(data, "Task name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nTGID: %d"
-//	//	"\nParent ID: %d \nStart Time: %llu \nDynamic priority: %d \nStatic Prio: %d \nNormal Priority: %d"
-//	//	"\nRT Priority: %d", task->comm, task->state, pid, task->cpu, task->tgid, task->real_parent->pid,
-//	//	task->start_time, task->prio, task->static_prio, task->normal_prio, task->rt_priority);*/
-//
-//	///* null checks */
-//	///*if (task->active_mm == NULL) {
-//	//	offset += sprintf(data + strlen(data), "\nactive mm struct is null!"); goto exit;
-//
-//	//}*/
-//
-//	///*offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nNo.of vmem address %d \nTotal pages mapped: %lu"
-//	//	"\nVirtual Memory Usage: %llu \nVirtual mem space: %lu\n", task->active_mm->mmap_base, task->active_mm->map_count,
-//	//	task->active_mm->total_vm, task->acct_vm_mem1, task->active_mm->task_size);*/
-//
-//	offset = sprintf(data, "Hello World!\n");
-//
-//exit:
-//	return offset;
-//
-//}
-
 static int s2fs_open(struct inode* inode, struct file* filp)
 {
 	filp->private_data = inode->i_private;
 	return 0;
 }
-
 
 static ssize_t s2fs_read_file(struct file* filp, char* buf, size_t count, loff_t* offset)
 {
@@ -100,7 +64,6 @@ static ssize_t s2fs_read_file(struct file* filp, char* buf, size_t count, loff_t
 		return -EFAULT;
 	*offset += count;
 	return count;
-	//	return simple_read_from_buffer(buf, len, offset, tmp, len);
 }
 
 static ssize_t s2fs_write_file(struct file* filp, const char* buf,
@@ -191,38 +154,6 @@ static struct super_operations s2fs_s_ops = {
 	.statfs = simple_statfs,
 	.drop_inode = generic_delete_inode,
 };
-
-//void traverse(struct super_block* sb, struct dentry* parent, struct task_struct* task)
-//{
-//
-//	struct dentry* dir;
-//	char str_pid[6];
-//	char* s;
-//	/*struct list_head* list;
-//	struct task_struct* task_child;*/
-//	s = "foo";
-//	snprintf(str_pid, 6, "%s", s);
-//
-//	//if (!list_empty(&task->children)) {
-//	//	dir = s2fs_create_dir(sb, parent, str_pid);
-//	//	s2fs_create_file(sb, dir, str_pid);
-//	//}
-//	//else
-//	//	s2fs_create_file(sb, parent, str_pid);
-//
-//	//list_for_each(list, &task->children) {
-//
-//	//	task_child = list_entry(list, struct task_struct, sibling);
-//	//	if (task_child) {
-//
-//	//		traverse(sb, dir, task_child);
-//	//	}
-//	//}
-//	dir = s2fs_create_dir(sb, parent, str_pid);
-//	s = "bar";
-//	snprintf(str_pid, 6, "%s", s);
-//	s2fs_create_file(sb, dir, str_pid);
-//}
 
 static int s2fs_fill_super(struct super_block* sb, void* data, int silent)
 {
