@@ -115,7 +115,6 @@ out:
 	return 0;
 }
 
-
 static struct dentry* s2fs_create_dir(struct super_block* sb,
 	struct dentry* parent, const char* name)
 {
