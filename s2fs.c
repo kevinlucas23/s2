@@ -90,7 +90,7 @@ static ssize_t s2fs_read_file(struct file* filp, char* buf, size_t count, loff_t
 
 	pid = filp->private_data;
 	tmp = (char*)kmalloc(500, GFP_KERNEL);
-	len = sprintf(data, "Hello World!\n");
+	len = sprintf(tmp, "Hello World!\n");
 
 	if (*offset > len)
 		return 0;
