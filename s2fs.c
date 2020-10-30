@@ -19,7 +19,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kevin");
-MODULE_DESCRIPTION("Mount and Unmount a Pseudo File system Linux Project 4 part 2");
+MODULE_DESCRIPTION("Implement File Operations which creates a foo directory with a bar file in that directory Linux Project 4 part 3");
 
 #define S2FS_MAGIC 0x19920342
 
