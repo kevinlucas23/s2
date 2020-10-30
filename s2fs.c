@@ -19,7 +19,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kevin");
-MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 1");
+MODULE_DESCRIPTION("Print the Process Tree of Linux Project 4 part 4");
 
 #define S2FS_MAGIC 0x19920342
 
