@@ -57,7 +57,7 @@ int get_task_info(int pid, char* data) {
 
 	if (task == NULL) { offset += sprintf(data, "Task no longer exists.\n"); goto exit; }
 
-	offset = sprintf(data, "Task name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nThead Group ID (TGID): %d"
+	offset = sprintf(data, "Task Name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nThead Group ID (TGID): %d"
 		"\nParent's ID (PPID): %d \nStart Time: %llu \nDynamic priority: %d \nStatic Priority: %d \nNormal Priority: %d"
 		"\nReal-time Priority: %d", task->comm, task->state, pid, task->cpu, task->tgid, task->real_parent->pid,
 		task->start_time, task->prio, task->static_prio, task->normal_prio, task->rt_priority);
@@ -109,7 +109,7 @@ static ssize_t s2fs_write_file(struct file* filp, const char* buf,
 }
 
 
-static struct file_operations s2fs_file_ops = {
+static struct file_operations s2fs_fops = {
 	.open = s2fs_open,
 	.read = s2fs_read_file,
 	.write = s2fs_write_file,
@@ -121,21 +121,21 @@ const struct inode_operations lwfs_inode_operations = {
 };
 
 static struct dentry* s2fs_create_file(struct super_block* sb,
-	struct dentry* dir, const char* name)
+	struct dentry* dir, const char* file_name)
 {
 	struct dentry* dentry;
 	struct inode* inode;
 	int pid, ret;
 	int* int_pid;
 
-	dentry = d_alloc_name(dir, name);
+	dentry = d_alloc_name(dir, file_name);
 	if (!dentry)
 		goto out;
 	inode = s2fs_make_inode(sb, S_IFREG | 0644);
 	if (!inode)
 		goto out_dput;
-	inode->i_fop = &s2fs_file_ops;
-	ret = kstrtoint(name, 10, &pid);
+	inode->i_fop = &s2fs_fops;
+	ret = kstrtoint(file_name, 10, &pid);
 
 	int_pid = (int*)kmalloc(sizeof(int), GFP_KERNEL);
 
@@ -154,14 +154,14 @@ out:
 
 
 static struct dentry* s2fs_create_dir(struct super_block* sb,
-	struct dentry* parent, const char* name)
+	struct dentry* parent, const char* dir_name)
 {
 	struct dentry* dentry;
 	struct inode* inode;
 	int pid, ret;
 	int* int_pid;
 
-	dentry = d_alloc_name(parent, name);
+	dentry = d_alloc_name(parent, dir_name);
 	if (!dentry)
 		goto out;
 
@@ -170,7 +170,7 @@ static struct dentry* s2fs_create_dir(struct super_block* sb,
 		goto out_dput;
 	inode->i_op = &simple_dir_inode_operations;
 	inode->i_fop = &simple_dir_operations;
-	ret = kstrtoint(name, 10, &pid);
+	ret = kstrtoint(dir_name, 10, &pid);
 
 	int_pid = (int*)kmalloc(sizeof(int), GFP_KERNEL);
 
@@ -194,7 +194,6 @@ static struct super_operations s2fs_s_ops = {
 
 void tree_to_dir(struct super_block* sb, struct dentry* parent, struct task_struct* task)
 {
-
 	struct dentry* dir;
 	char str_pid[6];
 
@@ -206,18 +205,17 @@ void tree_to_dir(struct super_block* sb, struct dentry* parent, struct task_stru
 		dir = s2fs_create_dir(sb, parent, str_pid);
 		s2fs_create_file(sb, dir, str_pid);
 	}
-	else
+	else{
 		s2fs_create_file(sb, parent, str_pid);
+	}
 
 	list_for_each(list, &task->children) {
-
 		task_child = list_entry(list, struct task_struct, sibling);
 		if (task_child) {
 
 			tree_to_dir(sb, dir, task_child);
 		}
 	}
-
 }
 
 static int s2fs_fill_super(struct super_block* sb, void* data, int silent)
