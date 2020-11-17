@@ -19,7 +19,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kevin");
-MODULE_DESCRIPTION("Print the Process Tree into files Linux Project 4 part 4");
+MODULE_DESCRIPTION("Implement File Operations which creates a foo directory with a bar file in that directory Linux Project 4 part 3");
 
 #define S2FS_MAGIC 0x19920342
 
@@ -38,50 +38,11 @@ static struct inode* s2fs_make_inode(struct super_block* sb, int mode)
 	return inode;
 }
 
-int get_task_info(int pid, char* data) {
-	struct task_struct* task;
-	struct pid* pid_struct;
-	int offset = 0;
-
-	pid_struct = find_get_pid(pid);
-
-	if (pid_struct == NULL) {
-		return -1;
-	}
-
-	task = pid_task(pid_struct, PIDTYPE_PID);
-
-	if (pid_struct == NULL) { offset += sprintf(data, "Task no longer exists.\n"); goto exit; }
-
-	task = pid_task(pid_struct, PIDTYPE_PID);
-
-	if (task == NULL) { offset += sprintf(data, "Task no longer exists.\n"); goto exit; }
-
-	offset = sprintf(data, "Task Name: %s \nTask State: %ld \nProcess Id: %d \nCPU Id: %u \nThead Group ID (TGID): %d"
-		"\nParent's ID (PPID): %d \nStart Time: %llu \nDynamic priority: %d \nStatic Priority: %d \nNormal Priority: %d"
-		"\nReal-time Priority: %d", task->comm, task->state, pid, task->cpu, task->tgid, task->real_parent->pid,
-		task->start_time, task->prio, task->static_prio, task->normal_prio, task->rt_priority);
-
-	/* null checks */
-	if (task->active_mm == NULL) {
-		offset += sprintf(data + strlen(data), "\nMemory Map Base: \nVirtual Memory Space: \nVirtual Memory Usage: \nNo. of Virtual Memory Address: \nTotal Pages Mapped: \n");
-		goto exit;
-	}
-
-	offset += sprintf(data + strlen(data), "\nMemory Map Base: %lu \nVirtual Memory Space: %lu \nVirtual Memory Usage: %llu \nNo. of Virtual Memory Address: %d \nTotal Pages Mapped: %lu \n",
-		task->active_mm->mmap_base, task->active_mm->task_size, task->acct_vm_mem1, task->active_mm->map_count, task->active_mm->total_vm);
-
-exit:
-	return offset;
-
-}
-
 static int s2fs_open(struct inode* inode, struct file* filp)
 {
 	filp->private_data = inode->i_private;
 	return 0;
 }
-
 
 static ssize_t s2fs_read_file(struct file* filp, char* buf, size_t count, loff_t* offset)
 {
@@ -91,7 +52,7 @@ static ssize_t s2fs_read_file(struct file* filp, char* buf, size_t count, loff_t
 
 	pid = filp->private_data;
 	tmp = (char*)kmalloc(500, GFP_KERNEL);
-	len = get_task_info(*pid, tmp);
+	len = sprintf(tmp, "Hello World!\n");
 
 	if (*offset > len)
 		return 0;
@@ -109,7 +70,7 @@ static ssize_t s2fs_write_file(struct file* filp, const char* buf,
 }
 
 
-static struct file_operations s2fs_fops = {
+static struct file_operations s2fs_file_ops = {
 	.open = s2fs_open,
 	.read = s2fs_read_file,
 	.write = s2fs_write_file,
@@ -134,7 +95,7 @@ static struct dentry* s2fs_create_file(struct super_block* sb,
 	inode = s2fs_make_inode(sb, S_IFREG | 0644);
 	if (!inode)
 		goto out_dput;
-	inode->i_fop = &s2fs_fops;
+	inode->i_fop = &s2fs_file_ops;
 	ret = kstrtoint(file_name, 10, &pid);
 
 	int_pid = (int*)kmalloc(sizeof(int), GFP_KERNEL);
@@ -151,7 +112,6 @@ out_dput:
 out:
 	return 0;
 }
-
 
 static struct dentry* s2fs_create_dir(struct super_block* sb,
 	struct dentry* parent, const char* dir_name)
@@ -192,37 +152,13 @@ static struct super_operations s2fs_s_ops = {
 	.drop_inode = generic_delete_inode,
 };
 
-void tree_to_dir(struct super_block* sb, struct dentry* parent, struct task_struct* task)
-{
-	struct dentry* dir;
-	char str_pid[6];
-
-	struct list_head* list;
-	struct task_struct* task_child;
-
-	snprintf(str_pid, 6, "%ld", (long)task->pid);
-	if (!list_empty(&task->children)) {
-		dir = s2fs_create_dir(sb, parent, str_pid);
-		s2fs_create_file(sb, dir, str_pid);
-	}
-	else{
-		s2fs_create_file(sb, parent, str_pid);
-	}
-
-	list_for_each(list, &task->children) {
-		task_child = list_entry(list, struct task_struct, sibling);
-		if (task_child) {
-
-			tree_to_dir(sb, dir, task_child);
-		}
-	}
-}
-
 static int s2fs_fill_super(struct super_block* sb, void* data, int silent)
 {
 	struct inode* root;
 	struct dentry* root_dentry;
-	struct task_struct* task;
+	struct dentry* dir;
+	char str_pid[6];
+	char* s;
 
 	sb->s_blocksize = VMACACHE_SIZE;
 	sb->s_blocksize_bits = VMACACHE_SIZE;
@@ -240,9 +176,13 @@ static int s2fs_fill_super(struct super_block* sb, void* data, int silent)
 	if (!root_dentry)
 		goto out_iput;
 
-	task = &init_task;
+	s = "foo";
+	snprintf(str_pid, 6, "%s", s);
 
-	tree_to_dir(sb, root_dentry, task);
+	dir = s2fs_create_dir(sb, root_dentry, str_pid);
+	s = "bar";
+	snprintf(str_pid, 6, "%s", s);
+	s2fs_create_file(sb, dir, str_pid);
 
 	sb->s_root = root_dentry;
 	return 0;
